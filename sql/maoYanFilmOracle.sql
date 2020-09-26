@@ -1,0 +1,55 @@
+--------------------------------------------------------
+--  文件已创建 - 星期六-九月-26-2020
+--------------------------------------------------------
+--------------------------------------------------------
+--  DDL for Table FILMCOMMENT
+--------------------------------------------------------
+
+-- 第一次执行，把这几句话注释掉
+DROP TABLE "C##SCOTTER"."FILMCOMMENT";
+
+-- 删库有风险，请慎重考虑
+
+
+
+CREATE TABLE "C##SCOTTER"."FILMCOMMENT"
+(	"ID" NUMBER(32,0),
+     "FILMNAME" VARCHAR2(255 BYTE),
+     "FILM_COMMENT" VARCHAR2(255 BYTE)
+) SEGMENT CREATION IMMEDIATE
+    PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255
+    NOCOMPRESS LOGGING
+    STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+    PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+    BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+    TABLESPACE "USERS" ;
+
+
+Insert into C##SCOTTER.FILMCOMMENT (ID,FILMNAME,FILM_COMMENT) values (0,'蜘蛛侠：英雄远征','只有蜘蛛侠哭着说我不想死。。。哭卿卿～');
+Insert into C##SCOTTER.FILMCOMMENT (ID,FILMNAME,FILM_COMMENT) values (1,'蜘蛛侠：英雄远征','拜托，复联3里他们比不是死了，只是没困在某个量子空间，请你们去看蚁人2，复联4里所有人都会回归，而蜘蛛侠2的故事情节发生在复联4后，无语。。。');
+Insert into C##SCOTTER.FILMCOMMENT (ID,FILMNAME,FILM_COMMENT) values (2,'蜘蛛侠：英雄远征','''看完《复仇者联盟3:无限战争》来搜小蜘蛛的举个手，看看漫威队伍多强大');
+
+--------------------------------------------------------
+--  DDL for Index FILMCOMMENT_PK
+--------------------------------------------------------
+
+CREATE UNIQUE INDEX "C##SCOTTER"."FILMCOMMENT_PK" ON "C##SCOTTER"."FILMCOMMENT" ("ID")
+    PCTFREE 10 INITRANS 2 MAXTRANS 255
+    STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+    PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+    BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+    TABLESPACE "USERS" ;
+--------------------------------------------------------
+--  Constraints for Table FILMCOMMENT
+--------------------------------------------------------
+
+ALTER TABLE "C##SCOTTER"."FILMCOMMENT" ADD CONSTRAINT "FILMCOMMENT_PK" PRIMARY KEY ("ID")
+    USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255
+        STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+        PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+        BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+        TABLESPACE "USERS"  ENABLE;
+ALTER TABLE "C##SCOTTER"."FILMCOMMENT" MODIFY ("FILM_COMMENT" NOT NULL ENABLE);
+ALTER TABLE "C##SCOTTER"."FILMCOMMENT" MODIFY ("FILMNAME" NOT NULL ENABLE);
+ALTER TABLE "C##SCOTTER"."FILMCOMMENT" MODIFY ("ID" NOT NULL ENABLE);
+
