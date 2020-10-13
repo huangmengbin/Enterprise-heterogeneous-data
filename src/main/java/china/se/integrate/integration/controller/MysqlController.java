@@ -19,6 +19,6 @@ public class MysqlController {
 
     @GetMapping("/getTableColumn")
     public void listTableName(){
-        dao.getAllTables("");
+        dao.getAllTables(null,"");
     }
 }

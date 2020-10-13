@@ -5,7 +5,7 @@ package china.se.integrate.integration.service;
  */
 public class MysqlServiceImpl {
 
-    public void union(){
+    public void trans(){
 
     }
 }

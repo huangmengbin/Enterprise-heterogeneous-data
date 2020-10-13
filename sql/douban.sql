@@ -4,6 +4,7 @@
 -- ------------------------------------------------------
 -- Server version	5.1.73-community
 
+
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -18,14 +19,13 @@
 --
 -- Table structure for table `hotcomments`
 --
-
 DROP TABLE IF EXISTS `hotcomments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `hotcomments` (
   `hotcomments_id` int(11) NOT NULL AUTO_INCREMENT,
-  `movie_id` int(11) DEFAULT NULL,
-  `hotCommentAuthor` varchar(45) DEFAULT NULL,
+  `movie_id` int(11) not NULL,
+  `hotCommentAuthor` varchar(45) NULL,
   `hotCommentDate` varchar(45) DEFAULT NULL,
   `hotCommentContent` varchar(450) DEFAULT NULL,
   PRIMARY KEY (`hotcomments_id`)
@@ -51,18 +51,18 @@ DROP TABLE IF EXISTS `movie`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `movie` (
-  `id` int(11) NOT NULL,
-  `title` varchar(45) DEFAULT NULL,
+  id int(11) NOT NULL default '67',
+  `title` varchar(100) not NULL,
   `directors` varchar(450) DEFAULT NULL,
-  `rate` varchar(45) DEFAULT NULL,
-  `casts` varchar(450) DEFAULT NULL,
+  `rate` varchar(45),
+  `casts` varchar(450) DEFAULT '',
   `type` varchar(450) DEFAULT NULL,
   `nation` varchar(450) DEFAULT NULL,
-  `language` varchar(450) DEFAULT NULL,
-  `date` varchar(450) DEFAULT NULL,
+  `language` varchar(450) DEFAULT '6',
+  `date` varchar(450) DEFAULT "666",
   `time` varchar(450) DEFAULT NULL,
-  `peopleNumber` varchar(45) DEFAULT NULL,
-  `introduction` varchar(4500) DEFAULT NULL,
+  `peopleNumber` varchar(45)  not null,
+  `introduction` varchar(4000) DEFAULT '67666',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
