@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ public class MysqlJdbc {
     private final static String driverName = "com.mysql.cj.jdbc.Driver";
 
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args){
         try {
             testTransMysqlToOracle();
         } catch (SQLException e){
@@ -37,23 +38,22 @@ public class MysqlJdbc {
         String mysqlUrl = "jdbc:mysql://localhost:3306/integrate?serverTimezone=UTC";
         String mysqlUsername = "root";
         String mysqlPassword = "1234";
-        Connection mysqlConnection = DriverManager.getConnection(mysqlUrl, mysqlUsername, mysqlPassword);;
+        Connection mysqlConnection = DriverManager.getConnection(mysqlUrl, mysqlUsername, mysqlPassword);
 
         String oracleUrl="jdbc:oracle:thin:@localhost:1521/orcl";	//test为数据库名称，1521为连接数据库的默认端口
         String oracleUser="c##scotter".toUpperCase();	//用户名
         String oraclePassword="1234";	//1234为密码
-        Connection oracleConnection = DriverManager.getConnection(oracleUrl, oracleUser, oraclePassword);;
+        Connection oracleConnection = DriverManager.getConnection(oracleUrl, oracleUser, oraclePassword);
 
         List<TableHead> movie = mysql.getAllTables(mysqlConnection, "movie");
         movie.forEach(System.out::println);
         oracle.createTableByHead(oracleConnection, movie, "movieOracle");
 
-        ResultSet resultSet = mysql.selectAllFromTable(mysqlConnection, "movie");
-        oracle.insertAll(oracleConnection, "movieOracle", resultSet);
+        List<ArrayList<String>> lists = mysql.selectAllFromTable(mysqlConnection, "movie");
+        oracle.insertAll(oracleConnection, "movieOracle", lists);
 
         mysqlConnection.close();
         oracleConnection.close();
-        resultSet.close();
 
     }
 
@@ -64,8 +64,6 @@ public class MysqlJdbc {
         ResultSet resultSet = null;
         ArrayList<TableHead> result = new ArrayList<>();
         try {
-
-
 
             String sql = "show columns from "+tableName;
             statement = connection.prepareStatement(sql);
@@ -93,8 +91,8 @@ public class MysqlJdbc {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            return result;
         }
+        return result;
     }
 
     public void createTableByHead(Connection connection, List<TableHead> tableHeadList, String tableName){
@@ -151,14 +149,20 @@ public class MysqlJdbc {
         }
     }
 
-    public ResultSet selectAllFromTable(Connection connection, String tableName){
+    public LinkedList<ArrayList<String>> selectAllFromTable(Connection connection, String tableName){
         ResultSet resultSet;
-        CachedRowSetImpl trueResult = null;
+        LinkedList<ArrayList<String>> trueResult = new LinkedList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("select * from `" + tableName + "`;");
             resultSet = preparedStatement.executeQuery();
-            trueResult = new CachedRowSetImpl();
-            trueResult.populate(resultSet);
+            final int total = resultSet.getMetaData().getColumnCount();
+            while (resultSet.next()){
+                ArrayList<String> tmp = new ArrayList<>(total);
+                for(int i = 1; i<= total; ++i) {
+                    tmp.add(resultSet.getString(i));
+                }
+                trueResult.add(tmp);
+            }
             preparedStatement.close();
         } catch (SQLException e){
             e.printStackTrace();
@@ -166,15 +170,14 @@ public class MysqlJdbc {
         return trueResult;
     }
 
-    public void insertAll(Connection connection, String tableName, ResultSet resultSet){
+    public void insertAll(Connection connection, String tableName, List<ArrayList<String>> lists){
         try {
-            int total = resultSet.getMetaData().getColumnCount();
             StringBuilder sql = new StringBuilder("INSERT INTO `"+tableName+"` VALUES  ");
-            while (resultSet.next()) {
+            for(ArrayList<String> arrayList: lists) {
                 sql.append('(');
-                for(int i = 1; i<= total; ++i){
-                    sql.append("'").append(resultSet.getString(i).replaceAll("'","''")).append("'");
-                    if(i < total){
+                for(int i = 0; i< arrayList.size(); ++i){
+                    sql.append("'").append(arrayList.get(i).replaceAll("'","''")).append("'");
+                    if(i < arrayList.size()-1){
                         sql.append(',');
                     }
                 }

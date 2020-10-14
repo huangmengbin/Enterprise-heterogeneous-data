@@ -6,6 +6,7 @@ import com.sun.rowset.CachedRowSetImpl;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -35,19 +36,18 @@ public class OracleJdbc {
         String mysqlUrl = "jdbc:mysql://localhost:3306/integrate?serverTimezone=UTC";
         String mysqlUsername = "root";
         String mysqlPassword = "1234";
-        Connection mysqlConnection = DriverManager.getConnection(mysqlUrl, mysqlUsername, mysqlPassword);;
+        Connection mysqlConnection = DriverManager.getConnection(mysqlUrl, mysqlUsername, mysqlPassword);
 
 
         List<TableHead> filmComment = oracle.getAllTables(oracleConnection, "FILMCOMMENT");
         filmComment.forEach(System.out::println);
-        ResultSet resultSet = oracle.selectAllFromTable(oracleConnection, "FILMCOMMENT");
+        List<ArrayList<String>> lists = oracle.selectAllFromTable(oracleConnection, "FILMCOMMENT");
 
         mysql.createTableByHead(mysqlConnection, filmComment, "filmComment01");
-        mysql.insertAll(mysqlConnection, "filmComment01", resultSet);
+        mysql.insertAll(mysqlConnection, "filmComment01", lists);
 
         mysqlConnection.close();
         oracleConnection.close();
-        resultSet.close();
     }
 
     public List<TableHead> getAllTables(Connection connection, String tableName){
@@ -107,9 +107,8 @@ public class OracleJdbc {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            return result;
         }
-
+        return result;
     }
 
     public void createTableByHead(Connection connection, List<TableHead> tableHeadList, String tableName){
@@ -168,17 +167,22 @@ public class OracleJdbc {
     }
 
 
-    public ResultSet selectAllFromTable(Connection connection, String tableName){
+    public LinkedList<ArrayList<String>> selectAllFromTable(Connection connection, String tableName){
         tableName = tableName.toUpperCase();
         ResultSet resultSet;
-        CachedRowSetImpl trueResult = null;
+        LinkedList<ArrayList<String>> trueResult = new LinkedList<>();
         try {
             String username= connection.getSchema().toUpperCase();
-
             PreparedStatement preparedStatement = connection.prepareStatement("select * from "  +'"'+ username +'"'+'.'+'"'+ tableName +'"');
             resultSet = preparedStatement.executeQuery();
-            trueResult = new CachedRowSetImpl();
-            trueResult.populate(resultSet);
+            final int total = resultSet.getMetaData().getColumnCount();
+            while (resultSet.next()){
+                ArrayList<String> tmp = new ArrayList<>(total);
+                for(int i = 1; i<= total; ++i) {
+                    tmp.add(resultSet.getString(i));
+                }
+                trueResult.add(tmp);
+            }
             preparedStatement.close();
         } catch (SQLException e){
             e.printStackTrace();
@@ -186,17 +190,16 @@ public class OracleJdbc {
         return trueResult;
     }
 
-    public void insertAll(Connection connection, String tableName, ResultSet resultSet){
+    public void insertAll(Connection connection, String tableName, List<ArrayList<String>> lists){
         try {
             tableName = tableName.toUpperCase();
-            int total = resultSet.getMetaData().getColumnCount();
             String username= connection.getSchema().toUpperCase();
-            while (resultSet.next()) {
+            for(ArrayList<String> arrayList: lists) {
                 StringBuilder sql = new StringBuilder("insert into " + username + '.' + tableName + " values ( ");
 
-                for(int i = 1; i<= total; ++i) {
-                    sql.append("'").append(resultSet.getString(i).replaceAll("'","''")).append("'");
-                    if(i < total){
+                for(int i = 0; i< arrayList.size(); ++i) {
+                    sql.append("'").append(arrayList.get(i).replaceAll("'","''")).append("'");
+                    if(i < arrayList.size()-1){
                         sql.append(',');
                     }
                 }
